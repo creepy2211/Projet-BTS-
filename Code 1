@@ -1,0 +1,44 @@
+#include <HardwareSerial.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include "RTClib.h"
+#include "DFRobot_VEML7700.h"
+
+RTC_DS3231 rtc;
+DFRobot_VEML7700 als;
+
+HardwareSerial SerialRS232(2); // Utilise le port série 2 du ESP32
+Adafruit_SSD1306 display = Adafruit_SSD1306(128, 64, &Wire, -1);
+
+void setup() {
+  Serial.begin(38400); // Initialisation du moniteur série
+  SerialRS232.begin(38400, SERIAL_8N1, 5, 4); // Initialisation du port série RS232
+  
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+  display.setCursor(0, 0);
+  display.setTextSize(1);
+  display.print("SENS ET VITESSE DU VENT :");
+  display.display();
+  
+  delay(10);
+}
+
+void loop() {
+  // Lire les données de la liaison RS232
+  if (SerialRS232.available()) {
+    char receivedChar = SerialRS232.read();
+    
+    Serial.print(receivedChar); // Affiche les données sur le moniteur série
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.setTextSize(2);
+    display.print(receivedChar);
+    display.display();
+    Serial.read();
+    }
+
+}
